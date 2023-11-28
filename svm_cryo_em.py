@@ -20,7 +20,7 @@ class CryoClassification():
         self.dataset_root = root
         self.gt_labels = np.array([], dtype=object).reshape(0,2)
         self.img_array = []
-        
+
     def get_label_image_dataset(self):
 
         for subdir, _, files in os.walk(self.dataset_root):
@@ -45,22 +45,28 @@ class CryoClassification():
 
         return self.img_array, self.gt_labels       
 
-    def viz_img(flattened_list):
+    def viz_img(self, flattened_list):
         img = np.reshape(np.array(flattened_list), (64,64))
-        plt.imshow(img)      
+        plt.imshow(img)
+
+    def explore_data(self):
+        x, y = self.get_label_image_dataset()
+        for i in range(len(y)):
+            print(y[i])
+            self.viz_img(x[i])
 
     def run_svm(self):
         x, y = self.get_label_image_dataset()
-        x_train, x_test, y_train, y_test = train_test_split(x, list(y[:, -1]), test_size=0.20, random_state=77, stratify=y) 
+        x_train, x_test, y_train, y_test = train_test_split(x, list(y[:, -1]), test_size=0.20, random_state=0, shuffle=True, stratify=y) 
 
-        param_grid={'C':[0.1,1,10,100], 
-                    'gamma':[0.0001,0.001,0.1,1], 
-                    'kernel':['rbf','poly']} 
+        param_grid = {'C': [0.1, 1, 10, 100], 
+                    'gamma': [0.0001, 0.001, 0.1, 1], 
+                    'kernel': ['linear', 'rbf', 'poly']} 
         
         svc = svm.SVC(probability=True) 
         model = GridSearchCV(svc,param_grid)
 
-        model.fit(x_train[:100],y_train[:100])
+        model.fit(x_train[:5000], y_train[:5000])
 
         y_pred = model.predict(x_test) 
         accuracy = accuracy_score(y_pred, y_test) 
