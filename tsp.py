@@ -42,7 +42,7 @@ def convert_coords_to_dist_matrix(x, y):
     # data_array = np.array(d)
     # plt.imshow(data_array, cmap='viridis', interpolation='nearest')
     # plt.colorbar()
-    # plt.show()
+    plt.show()
     return d
 
 
@@ -51,9 +51,32 @@ def basic_tsp(d):
 
     pass
 
-def tsp_nearest_neighbor(d):
+def tsp_nearest_neighbor(distances):
     # Time complexity O(n^2); Greedy
-    pass
+    # https://www.w3schools.com/dsa/dsa_ref_traveling_salesman.php
+
+    n = len(distances)
+    visited = [False] * n
+    route = [0]
+    visited[0] = True
+    total_distance = 0
+
+    for _ in range(1, n):
+        last = route[-1]
+        nearest = None
+        min_dist = float('inf')
+        for i in range(n):
+            if not visited[i] and distances[last][i] < min_dist:
+                min_dist = distances[last][i]
+                nearest = i
+        route.append(nearest)
+        visited[nearest] = True
+        total_distance += min_dist
+
+    total_distance += distances[route[-1]][0]
+    route.append(0)
+    return route, total_distance
+
 
 def tsp_bucket_sort():
     pass
@@ -61,3 +84,4 @@ def tsp_bucket_sort():
 x, y = create_dummy_points(10, 5)
 d = convert_coords_to_dist_matrix(x, y)
 order_nearest_neigh = tsp_nearest_neighbor(d)
+print(order_nearest_neigh)
