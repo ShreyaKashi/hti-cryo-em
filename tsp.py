@@ -1,9 +1,16 @@
+from itertools import permutations
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.random import RandomState
+from qthist2d import qthist, qtcount
+from matplotlib.path import Path
+import time
 
 def get_center_from_bbox(bbox):
     #TODO: Implement for real data
+    # The attributes are "boxes", a list of bounding box coordinates (x_min, y_min, x_max, y_max) and 
+    # "scores", a list of corresponding score
+
     pass
 
 
@@ -42,14 +49,31 @@ def convert_coords_to_dist_matrix(x, y):
     # data_array = np.array(d)
     # plt.imshow(data_array, cmap='viridis', interpolation='nearest')
     # plt.colorbar()
-    plt.show()
+    # plt.show()
     return d
 
 
-def basic_tsp(d):
+def basic_tsp(cost):
     # Time complexity O(n!); Optimal
 
-    pass
+    numNodes = len(cost)
+    nodes = list(range(1, numNodes))
+
+    minCost = float('inf')
+
+    for perm in permutations(nodes):
+        currCost = 0
+        currNode = 0
+
+        for node in perm:
+            currCost += cost[currNode][node]
+            currNode = node
+
+        currCost += cost[currNode][0]
+
+        minCost = min(minCost, currCost)
+
+    return minCost
 
 def tsp_nearest_neighbor(distances):
     # Time complexity O(n^2); Greedy
@@ -78,10 +102,48 @@ def tsp_nearest_neighbor(distances):
     return route, total_distance
 
 
-def tsp_bucket_sort():
-    pass
+def tsp_bucket_sort(x,y):
+
+    graph = {}
+
+    def create_graph():
+        pass
+
+    num, xmin, xmax, ymin, ymax = qthist(x,y, N=5, thresh=4)
+    pts = np.column_stack((x,y))
+    fig = plt.figure()
+
+    ax = fig.add_subplot(111)
+
+    plt.scatter(x,y, alpha=0.5)
+    
+
+    for k in range(len(num)):
+        ax.add_patch(plt.Rectangle((xmin[k], ymin[k]), xmax[k]-xmin[k], ymax[k]-ymin[k], 
+                                fc ='none', ec='k', alpha=0.5))
+        
+        ll = [xmin[k], ymin[k]]
+        ur = [xmax[k], ymax[k]]
+        inidx = np.all(np.logical_and(ll <= pts, pts <= ur), axis=1)
+        inbox = pts[inidx]
+        print(inbox)
+        
+    
+
 
 x, y = create_dummy_points(10, 5)
 d = convert_coords_to_dist_matrix(x, y)
+
+start = time.time()
+order_original_tsp = basic_tsp(d)
+end = time.time()
+print("Original TSP: ", end - start)
+
+start = time.time()
 order_nearest_neigh = tsp_nearest_neighbor(d)
-print(order_nearest_neigh)
+end = time.time()
+print("Nearest Neighbor: ", end - start)
+
+print("Order: ", order_original_tsp, order_nearest_neigh)
+# tsp_bucket_sort(x,y)
+# plt.show()
