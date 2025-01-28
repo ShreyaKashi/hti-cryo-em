@@ -1,4 +1,4 @@
-# HTI_CryoEM
+# Optimizing microscope control
 
 Cryo-EM is a technique that involves studying frozen samples deposited within a grid of squares and holes through a microscope. Not all squares and holes have good quality samples which would help in diagnosis. Some, based on how they were frozen, have high noise and are not very useful to study. Since using a cryoelectron microscope is expensive, we wish to optimize microscope control to efficiently traverse over all the good quality squares/holes during data collection. 
 
